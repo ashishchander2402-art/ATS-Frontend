@@ -31,7 +31,11 @@ const HomePage = () => {
         </h2>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <ResumeUploadZone file={resumeFile} onFileSelect={setResumeFile} />
+          <ResumeUploadZone
+            file={resumeFile}
+            onFileSelect={setResumeFile}
+            disabled={loading}
+          />
 
           <div>
             <label
@@ -44,8 +48,9 @@ const HomePage = () => {
               id="job-description"
               value={jobDescription}
               onChange={(event) => setJobDescription(event.target.value)}
+              disabled={loading}
               placeholder={`React JS Developer\n\nResponsibilities:\n- Develop and maintain web applications\n- Collaborate with design team\n\nRequired Skills:\n- React.js, JavaScript, REST APIs`}
-              className="min-h-40 w-full resize-y rounded-lg border border-slate-300 p-3 text-sm text-slate-700 outline-none focus:border-[#3b41e3] focus:ring-2 focus:ring-[#3b41e3]/20"
+              className="min-h-40 w-full resize-y rounded-lg border border-slate-300 p-3 text-sm text-slate-700 outline-none focus:border-[#3b41e3] focus:ring-2 focus:ring-[#3b41e3]/20 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:opacity-60"
               rows={7}
             />
           </div>

@@ -3,14 +3,19 @@ import { useRef, useState, type DragEvent, type ChangeEvent } from "react";
 interface ResumeUploadZoneProps {
   file: File | null;
   onFileSelect: (file: File | null) => void;
+  disabled?: boolean;
 }
 
-const ResumeUploadZone = ({ file, onFileSelect }: ResumeUploadZoneProps) => {
+const ResumeUploadZone = ({
+  file,
+  onFileSelect,
+  disabled = false,
+}: ResumeUploadZoneProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
   const handleFile = (selected: File | null) => {
-    if (!selected) return;
+    if (disabled || !selected) return;
 
     if (selected.type !== "application/pdf" && !selected.name.endsWith(".pdf")) {
       alert("Please upload a PDF file only.");
@@ -23,6 +28,7 @@ const ResumeUploadZone = ({ file, onFileSelect }: ResumeUploadZoneProps) => {
   const onDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     setIsDragging(false);
+    if (disabled) return;
     handleFile(event.dataTransfer.files?.[0] ?? null);
   };
 
@@ -38,23 +44,29 @@ const ResumeUploadZone = ({ file, onFileSelect }: ResumeUploadZoneProps) => {
 
       <div
         role="button"
-        tabIndex={0}
-        onClick={() => inputRef.current?.click()}
+        tabIndex={disabled ? -1 : 0}
+        aria-disabled={disabled}
+        onClick={() => {
+          if (!disabled) inputRef.current?.click();
+        }}
         onKeyDown={(event) => {
+          if (disabled) return;
           if (event.key === "Enter" || event.key === " ") {
             inputRef.current?.click();
           }
         }}
         onDragOver={(event) => {
           event.preventDefault();
-          setIsDragging(true);
+          if (!disabled) setIsDragging(true);
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={onDrop}
-        className={`flex min-h-40 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-4 py-6 transition-colors ${
-          isDragging
-            ? "border-[#3b41e3] bg-blue-50/40"
-            : "border-slate-300 hover:border-blue-400 hover:bg-slate-50"
+        className={`flex min-h-40 flex-col items-center justify-center rounded-lg border-2 border-dashed px-4 py-6 transition-colors ${
+          disabled
+            ? "cursor-not-allowed border-slate-200 bg-slate-50 opacity-60"
+            : isDragging
+              ? "cursor-pointer border-[#3b41e3] bg-blue-50/40"
+              : "cursor-pointer border-slate-300 hover:border-blue-400 hover:bg-slate-50"
         }`}
       >
         <input
@@ -62,6 +74,7 @@ const ResumeUploadZone = ({ file, onFileSelect }: ResumeUploadZoneProps) => {
           type="file"
           accept=".pdf,application/pdf"
           className="hidden"
+          disabled={disabled}
           onChange={onInputChange}
         />
 
