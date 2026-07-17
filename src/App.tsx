@@ -7,17 +7,28 @@ import { Route, Routes } from 'react-router-dom'
 import HomePage from './components/homePage'
 import MainLayout from './layouts/MainLayouts'
 import ParsingHistory from './components/parsingHistory'
+import AuthLayout from './layouts/AuthLayout'
+import LoginForm from './components/loginForm'
+import SignUpForm from './components/signUpForm'
+import ResetYourPasswordForm from './components/resetYourPasswordForm'
+import SetNewPasswordForm from './components/setNewPassowordForm'
 
 function App() {
-  // const [count, setCount] = useState(0)
-
   return (
     <>
-
       <Routes>
+        {/* Main Application Layout */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/test" element={<ParsingHistory />} />
+        </Route>
+
+        {/* Authentication Pages Layout */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/signup" element={<SignUpForm />} />
+          <Route path="/resetpassword" element={<ResetYourPasswordForm />} />
+          <Route path="/newpassword" element={<SetNewPasswordForm />} />
         </Route>
       </Routes>
       {/* <section id="center">
