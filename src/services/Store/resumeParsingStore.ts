@@ -195,7 +195,7 @@ export const useResumeParsingStore = create<ResumeParsingStore>((set, get) => ({
       formData.append("resume", resumeFile);
       formData.append("jobDescription", jobDescription.trim());
 
-      const response = await api.post("/parse-save", formData, {
+      const response = await api.post("/resume/parse-save", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

@@ -1,26 +1,31 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuthStore } from "../services/Store/authStore";
+import { showToast } from "../utils/toast";
 
 const ResetYourPasswordForm = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const {forgetPassword} = useAuthStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     if (!email) {
-      setError("Please enter your email address.");
+      showToast.error("Please enter your email address.");
       return;
     }
-    setError("");
-    setLoading(true);
-
-    // Simulate recovery link generation API
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
-    }, 1200);
+    setLoading(true)
+        try{
+          const data = await forgetPassword(email);
+          showToast.success(data?.data?.message);
+          setSuccess(true);
+        }catch(error: any){
+          const message = error.response?.data?.message || "Something went wrong. Please try again.";
+          showToast.error(message);
+        }finally{
+          setLoading(false);
+        }
   };
 
   return (
@@ -33,12 +38,6 @@ const ResetYourPasswordForm = () => {
           Enter your email for a recovery link.
         </p>
       </div>
-
-      {error && (
-        <div className="mt-4 rounded-xl bg-red-50 border border-red-150 p-3.5 text-xs text-red-600 font-medium text-left">
-          {error}
-        </div>
-      )}
 
       {success ? (
         <div className="mt-6 text-left">
@@ -90,7 +89,6 @@ const ResetYourPasswordForm = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email Address"
                 className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-700 outline-none focus:bg-white focus:border-[#3b41e3] focus:ring-2 focus:ring-[#3b41e3]/10 transition-all"
-                required
               />
             </div>
           </div>

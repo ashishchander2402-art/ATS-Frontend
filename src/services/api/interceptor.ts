@@ -6,10 +6,16 @@ import api from "./axios";
 api.interceptors.request.use(
   (config) => {
     // No authentication/token required for now.
+    const token = localStorage.getItem("accessKey")
+        if (token) {
+      config.headers = config.headers ?? {};
+      config.headers.Authorization = `Bearer ${token}`;
+    }
 
-    console.log(
-      `[Request] ${config.method?.toUpperCase()} ${config.url}`
-    );
+
+    // console.log(
+    //   `[Request] ${config.method?.toUpperCase()} ${config.url}`
+    // );
 
     return config;
   },
@@ -23,7 +29,7 @@ api.interceptors.request.use(
 // ======================
 api.interceptors.response.use(
   (response) => {
-    console.log("[Response]", response);
+    // console.log("[Response]", response);
 
     return response;
   },

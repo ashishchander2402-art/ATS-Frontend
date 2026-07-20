@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../services/Store/authStore";
+import { showToast } from "../utils/toast";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -7,23 +9,29 @@ const LoginForm = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
+  const {login} = useAuthStore()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      setError("Please fill in all fields.");
+      // setError("Please fill in all fields.");
+      showToast.error("Please fill in all fields.");
       return;
     }
-    setError("");
-    setLoading(true);
-
-    // Simulate API Sign In
-    setTimeout(() => {
-      setLoading(false);
-      // Navigate to home after login
+    setLoading(true)
+    try{
+      const data = await login(email, password);
+      showToast.success(data?.data?.message);
       navigate("/");
-    }, 1000);
+    }catch(error: any){
+      const message = error.response?.data?.message || "Something went wrong. Please try again.";
+      // setError(message);
+      showToast.error(message);
+      // console.log(error);
+    }finally{
+      setLoading(false);
+    }
   };
 
   return (
@@ -38,11 +46,11 @@ const LoginForm = () => {
         </p>
       </div>
 
-      {error && (
+      {/* {error && (
         <div className="mt-4 rounded-xl bg-red-50 border border-red-150 p-3.5 text-xs text-red-600 font-medium text-left">
           {error}
         </div>
-      )}
+      )} */}
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-5 text-left">
         {/* Email Address */}
@@ -78,7 +86,7 @@ const LoginForm = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email Address"
               className="block w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-700 outline-none focus:bg-white focus:border-[#3b41e3] focus:ring-2 focus:ring-[#3b41e3]/10 transition-all"
-              required
+              // required
             />
           </div>
         </div>
@@ -124,7 +132,7 @@ const LoginForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               className="block w-full pl-11 pr-11 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-700 outline-none focus:bg-white focus:border-[#3b41e3] focus:ring-2 focus:ring-[#3b41e3]/10 transition-all"
-              required
+              // required
             />
             <button
               type="button"

@@ -12,6 +12,8 @@ import LoginForm from './components/loginForm'
 import SignUpForm from './components/signUpForm'
 import ResetYourPasswordForm from './components/resetYourPasswordForm'
 import SetNewPasswordForm from './components/setNewPassowordForm'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 function App() {
   return (
@@ -20,7 +22,7 @@ function App() {
         {/* Main Application Layout */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/test" element={<ParsingHistory />} />
+          <Route path="/parsinghistory" element={<ParsingHistory />} />
         </Route>
 
         {/* Authentication Pages Layout */}
@@ -31,6 +33,18 @@ function App() {
           <Route path="/newpassword" element={<SetNewPasswordForm />} />
         </Route>
       </Routes>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       {/* <section id="center">
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />
