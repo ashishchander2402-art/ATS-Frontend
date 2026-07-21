@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuthStore } from "../services/Store/authStore";
+import { showToast } from "../utils/toast";
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -16,7 +18,8 @@ const SignUpForm = () => {
   const [strengthColor, setStrengthColor] = useState("bg-slate-200");
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const {signUp} = useAuthStore();
+  // const [error, setError] = useState("");
 
   // Calculate password strength
   useEffect(() => {
@@ -49,33 +52,32 @@ const SignUpForm = () => {
     }
   }, [password]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
-      setError("Please fill in all fields.");
+      showToast.error("Please fill in all fields")
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      showToast.error("Passwords do not match");
       return;
     }
     if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      showToast.error("Password must be at least 8 characters.");
       return;
     }
-    // if (!agreeTerms) {
-    //   setError("You must agree to the Terms of Service.");
-    //   return;
-    // }
 
-    setError("");
     setLoading(true);
-
-    // Simulate API sign up
-    setTimeout(() => {
-      setLoading(false);
-      navigate("/login");
-    }, 1200);
+    try{
+          const data = await signUp(firstName, lastName, email, password);
+          showToast.success(data?.data?.message);
+          navigate("/login");
+        }catch(error: any){
+          const message = error.response?.data?.message || "Something went wrong. Please try again.";
+          showToast.error(message);
+        }finally{
+          setLoading(false);
+        }
   };
 
   return (
@@ -89,11 +91,11 @@ const SignUpForm = () => {
         </p>
       </div>
 
-      {error && (
+      {/* {error && (
         <div className="mt-4 rounded-xl bg-red-50 border border-red-150 p-3.5 text-xs text-red-600 font-medium text-left">
           {error}
         </div>
-      )}
+      )} */}
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4 text-left">
         {/* Name Fields (Row) */}
@@ -129,7 +131,7 @@ const SignUpForm = () => {
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="First Name"
                 className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-700 outline-none focus:bg-white focus:border-[#3b41e3] focus:ring-2 focus:ring-[#3b41e3]/10 transition-all"
-                required
+                // required
               />
             </div>
           </div>
@@ -165,7 +167,7 @@ const SignUpForm = () => {
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Last Name"
                 className="block w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-700 outline-none focus:bg-white focus:border-[#3b41e3] focus:ring-2 focus:ring-[#3b41e3]/10 transition-all"
-                required
+                // required
               />
             </div>
           </div>
@@ -202,7 +204,7 @@ const SignUpForm = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email Address"
               className="block w-full pl-10.5 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-700 outline-none focus:bg-white focus:border-[#3b41e3] focus:ring-2 focus:ring-[#3b41e3]/10 transition-all"
-              required
+              // required
             />
           </div>
         </div>
@@ -238,7 +240,7 @@ const SignUpForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Min. 8 chars, 1 uppercase"
               className="block w-full pl-10.5 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-700 outline-none focus:bg-white focus:border-[#3b41e3] focus:ring-2 focus:ring-[#3b41e3]/10 transition-all"
-              required
+              // required
             />
             <button
               type="button"
@@ -351,7 +353,7 @@ const SignUpForm = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Re-enter your password"
               className="block w-full pl-10.5 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm placeholder-slate-400 text-slate-700 outline-none focus:bg-white focus:border-[#3b41e3] focus:ring-2 focus:ring-[#3b41e3]/10 transition-all"
-              required
+              // required
             />
           </div>
         </div>

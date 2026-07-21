@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { showToast } from "../utils/toast";
+import { useAuthStore } from "../services/Store/authStore";
 
 const SetNewPasswordForm = () => {
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ const SetNewPasswordForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const {newPassword} = useAuthStore();
 
   // Calculate password strength
   useEffect(() => {
@@ -46,29 +48,34 @@ const SetNewPasswordForm = () => {
     }
   }, [password]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [searchParams] = useSearchParams()
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const token = searchParams.get("token");
     if (!password || !confirmPassword) {
-      setError("Please fill in all fields.");
+      showToast.error("Please fill in all fields.");
       return;
     }
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      showToast.error("Passwords do not match.");
       return;
     }
     if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+      showToast.error("Password must be at least 8 characters.");
       return;
     }
-
-    setError("");
     setLoading(true);
-
-    // Simulate Reset Password API
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const data = await newPassword(token ? token : "NA", password);
+      showToast.success(data?.data?.message);
       setSuccess(true);
-    }, 1200);
+    } catch (error: any) {
+      const message = error.response?.data?.message || "Something went wrong. Please try again.";
+      showToast.error(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -81,12 +88,6 @@ const SetNewPasswordForm = () => {
           Create a strong, new password that you haven't used before.
         </p>
       </div>
-
-      {error && (
-        <div className="mt-4 rounded-xl bg-red-50 border border-red-150 p-3.5 text-xs text-red-600 font-medium text-left">
-          {error}
-        </div>
-      )}
 
       {success ? (
         <div className="mt-6 text-left">
@@ -183,19 +184,16 @@ const SetNewPasswordForm = () => {
               <div className="mt-2.5">
                 <div className="flex h-1.5 gap-1.5">
                   <div
-                    className={`h-full flex-1 rounded transition-colors duration-300 ${
-                      passwordStrength >= 1 ? strengthColor : "bg-slate-200"
-                    }`}
+                    className={`h-full flex-1 rounded transition-colors duration-300 ${passwordStrength >= 1 ? strengthColor : "bg-slate-200"
+                      }`}
                   />
                   <div
-                    className={`h-full flex-1 rounded transition-colors duration-300 ${
-                      passwordStrength >= 2 ? strengthColor : "bg-slate-200"
-                    }`}
+                    className={`h-full flex-1 rounded transition-colors duration-300 ${passwordStrength >= 2 ? strengthColor : "bg-slate-200"
+                      }`}
                   />
                   <div
-                    className={`h-full flex-1 rounded transition-colors duration-300 ${
-                      passwordStrength >= 3 ? strengthColor : "bg-slate-200"
-                    }`}
+                    className={`h-full flex-1 rounded transition-colors duration-300 ${passwordStrength >= 3 ? strengthColor : "bg-slate-200"
+                      }`}
                   />
                 </div>
                 <div className="mt-1 flex items-center justify-between text-[11px] font-bold text-slate-400">
