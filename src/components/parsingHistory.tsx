@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import type { ColDef } from "ag-grid-community";
 import TableComponent from "./tableComponent";
@@ -82,6 +82,7 @@ const mapBackendToAnalysisResult = (item: any): AnalysisResult => {
 export const ParsingHistory = () => {
   const [history, setHistory] = useState<HistoryRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const hasLoadedRef = useRef(false);
   const navigate = useNavigate();
   const setJobDescription = useResumeParsingStore((state) => state.setJobDescription);
   const { historyList, resumeHistory } = useResumeHistoryStore();
@@ -124,6 +125,8 @@ export const ParsingHistory = () => {
   };
 
   useEffect(() => {
+    if (hasLoadedRef.current) return;
+    hasLoadedRef.current = true;
     fetchHistory();
   }, []);
 
